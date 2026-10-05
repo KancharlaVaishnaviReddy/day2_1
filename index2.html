@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>objects demo</h1>
+    <h2>student details</h2>
+    <script>
+        const students = 
+        [
+            {
+            name: "Ashika",
+            email: "ashika@gmail.com",
+            age: 21,
+            city: "New York"
+        },
+          {
+            name: "Riya",
+            email: "riya@gmail.com",
+            age: 22,
+            city: "Los Angeles"
+        },
+        {
+            name: "Aadhya",
+            email: "aadhya@gmail.com",
+            age: 23,
+            city: "Texas"
+        },
+        {
+            name: "laya",
+            email: "laya@gmail.com",
+            age: 24,
+            city: "new Jersey"
+        }
+       
+    ]
+        console.log();
+        for (let i = 0; i < students.length; i++) {
+            document.write("<br><br>Name: " + students[i].name);
+            document.write("<br>Email: " + students[i].email);
+            document.write("<br>Age: " + students[i].age);
+            document.write("<br>City: " + students[i].city);
+        }
+    </script>
+</body>
+</html>

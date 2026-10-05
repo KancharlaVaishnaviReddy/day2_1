@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>intor demo</title>
+</head>
+<body>
+    <h1>food items</h1>
+    <script>
+        fetch("https://www.themealdb.com/api/json/v1/1/search.php?s=pizza")
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .then(data1=>
+            {
+                let meals = data1.meals;
+                let outputs = "";
+                for (let meal of meals) {
+                    outputs += `
+                    <div>
+                        <h2>${meal.strMeal}</h2>
+                        <img src="${meal.strMealThumb}" alt="${meal.strMeal}" width="200">
+                        <p>${meal.strInstructions}</p>
+                    </div>
+                    `;
+                }
+                document.write(outputs);
+            }
+        )
+     </script>
+       
+</body>
+</html>

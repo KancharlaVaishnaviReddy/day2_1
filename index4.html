@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#f8f7f2">
+	<title>Gather &amp; Graze | Find your next favorite</title>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+		:root {
+			color-scheme: light;
+			--paper: #f2f5ed; --surface: #fffefa; --ink: #202a22; --muted: #777d72;
+			--line: #e8e7df; --green: #315d45; --green-dark: #244734; --lime: #d8e981;
+			--coral: #dc765b; --shadow: 0 18px 50px rgba(37, 47, 36, .1);
+			font-family: 'DM Sans', sans-serif; font-synthesis: none; text-rendering: optimizeLegibility;
+		}
+		*, *::before, *::after { box-sizing: border-box; }
+		body { position: relative; isolation: isolate; margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); }
+		.ambient-clouds { position: fixed; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; }
+		.ambient-clouds::before, .ambient-clouds::after { position: absolute; inset: -18%; background-repeat: no-repeat; content: ''; filter: blur(42px); will-change: transform; }
+		.ambient-clouds::before { background-image: radial-gradient(ellipse at 22% 24%, rgba(137, 170, 105, .34), transparent 34%), radial-gradient(ellipse at 77% 32%, rgba(174, 197, 132, .28), transparent 31%), radial-gradient(ellipse at 47% 83%, rgba(190, 207, 155, .3), transparent 36%); animation: cloud-drift 34s ease-in-out infinite alternate; }
+		.ambient-clouds::after { background-image: radial-gradient(ellipse at 80% 76%, rgba(148, 180, 119, .25), transparent 34%), radial-gradient(ellipse at 8% 68%, rgba(206, 220, 176, .28), transparent 28%); animation: cloud-drift 43s ease-in-out infinite alternate-reverse; }
+		button, input, select { font: inherit; }
+		button { color: inherit; }
+		button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid #86a85e; outline-offset: 3px; }
+		.shell { width: min(1180px, calc(100% - 56px)); margin: 0 auto; }
+		.topbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+		.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+		.brand-mark { width: 35px; height: 35px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--green); }
+		.brand-name { font-size: 16px; font-weight: 700; letter-spacing: 0; }
+		.brand-name span { color: var(--green); }
+		.saved-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 9px 0 9px 12px; border: 0; background: transparent; color: #49534a; cursor: pointer; font-size: 13px; font-weight: 600; }
+		.saved-count { min-width: 21px; height: 21px; display: grid; place-items: center; padding: 0 5px; border-radius: 50px; background: #ecefe4; color: var(--green); font-size: 11px; }
+		.hero { position: relative; display: grid; grid-template-columns: 1.07fr .93fr; align-items: center; gap: 38px; min-height: 342px; padding: 40px 0 35px; }
+		.hero-copy { position: relative; z-index: 1; }
+		.eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 15px; color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 1.25px; text-transform: uppercase; }
+		.eyebrow::before { width: 20px; height: 1px; background: var(--coral); content: ''; }
+		h1, h2, h3, p { margin-top: 0; }
+		h1 { max-width: 505px; margin-bottom: 12px; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(40px, 5vw, 60px); font-weight: 600; letter-spacing: 0; line-height: 1.07; }
+		h1 em { color: var(--green); font-weight: 500; }
+		.hero-description { max-width: 410px; margin-bottom: 21px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+		.search-form { display: flex; width: min(490px, 100%); min-height: 53px; padding: 5px; border: 1px solid #e4e4db; border-radius: 6px; background: var(--surface); box-shadow: 0 5px 20px rgba(37, 47, 36, .045); }
+		.search-icon { align-self: center; flex: 0 0 auto; margin: 0 10px 0 11px; color: #788176; }
+		.search-form input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 13px; }
+		.search-form input::placeholder { color: #9a9d94; }
+		.search-form input:focus-visible { outline: 0; }
+		.search-button { flex: 0 0 auto; padding: 0 17px; border: 0; border-radius: 4px; background: var(--green); color: white; cursor: pointer; font-size: 12px; font-weight: 700; transition: background .2s, transform .2s; }
+		.search-button:hover { transform: translateY(-1px); background: var(--green-dark); }
+		.hero-art { position: relative; min-width: 0; height: 258px; }
+		.hero-photo { position: absolute; inset: 0 12px 0 22px; width: calc(100% - 34px); height: 100%; border-radius: 48% 48% 7px 7px; background: #e3e7d9; object-fit: cover; }
+		.photo-note { position: absolute; right: 0; bottom: 18px; display: flex; align-items: center; gap: 9px; padding: 11px 14px; border: 1px solid rgba(32, 42, 34, .08); border-radius: 5px; background: var(--surface); box-shadow: var(--shadow); font-size: 11px; font-weight: 600; }
+		.note-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); }
+		.hero-spark { position: absolute; top: 2px; right: 6px; color: var(--coral); font-size: 22px; }
+		.discover { padding: 28px 0 66px; border-top: 1px solid var(--line); }
+		.section-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 19px; }
+		.section-kicker { margin-bottom: 5px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1.15px; text-transform: uppercase; }
+		h2 { margin-bottom: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 600; letter-spacing: 0; }
+		.result-count { margin: 0 0 4px; color: var(--muted); font-size: 12px; }
+		.toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 19px; }
+		.filter-group { display: flex; flex-wrap: wrap; gap: 8px; }
+		.filter-select { min-width: 142px; height: 38px; padding: 0 30px 0 11px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: #4b554c; font-size: 11px; cursor: pointer; }
+		.sort-select { min-width: 132px; }
+		.clear-button { height: 38px; padding: 0 9px; border: 0; background: transparent; color: var(--green); cursor: pointer; font-size: 11px; font-weight: 700; }
+		.clear-button:hover { text-decoration: underline; }
+		.meal-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px 16px; }
+		.meal-card { min-width: 0; overflow: hidden; border: 1px solid #eeede6; border-radius: 5px; background: var(--surface); transition: box-shadow .2s, transform .2s; animation: rise-in .38s both; }
+		.meal-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(37, 47, 36, .09); }
+		.meal-image-wrap { position: relative; overflow: hidden; aspect-ratio: 1.35; background: #e7e9df; }
+		.meal-image { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .45s; }
+		.meal-card:hover .meal-image { transform: scale(1.045); }
+		.meal-category { position: absolute; bottom: 10px; left: 10px; max-width: calc(100% - 55px); overflow: hidden; padding: 6px 9px; border-radius: 3px; background: rgba(255, 254, 250, .95); color: var(--green); font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+		.favorite-button { position: absolute; top: 9px; right: 9px; width: 33px; height: 33px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255, 254, 250, .96); color: #5e665b; cursor: pointer; transition: color .2s, transform .2s; }
+		.favorite-button:hover { transform: scale(1.08); color: var(--coral); }
+		.favorite-button.is-saved { color: var(--coral); }
+		.meal-info { padding: 13px 13px 14px; }
+		.meal-area { margin-bottom: 5px; color: var(--muted); font-size: 10px; }
+		.meal-title { display: -webkit-box; overflow: hidden; min-height: 42px; margin-bottom: 11px; font-family: 'Playfair Display', Georgia, serif; font-size: 17px; font-weight: 600; letter-spacing: 0; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+		.card-link { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; color: var(--green); cursor: pointer; font-size: 10px; font-weight: 700; }
+		.card-link:hover { color: var(--coral); }
+		.state-panel { grid-column: 1 / -1; display: grid; min-height: 220px; place-content: center; justify-items: center; padding: 30px; border: 1px dashed #d9dbcf; border-radius: 5px; background: rgba(255, 254, 250, .54); text-align: center; }
+		.state-icon { display: grid; width: 44px; height: 44px; margin-bottom: 11px; place-items: center; border-radius: 50%; background: #edf0e3; color: var(--green); }
+		.state-panel h3 { margin-bottom: 5px; font-family: 'Playfair Display', Georgia, serif; font-size: 20px; }
+		.state-panel p { max-width: 340px; margin-bottom: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+		.retry-button { margin-top: 14px; padding: 9px 14px; border: 0; border-radius: 4px; background: var(--green); color: white; cursor: pointer; font-size: 11px; font-weight: 700; }
+		.loader { grid-column: 1 / -1; display: flex; min-height: 210px; align-items: center; justify-content: center; gap: 10px; color: var(--muted); font-size: 12px; }
+		.spinner { width: 17px; height: 17px; border: 2px solid #d8dece; border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; }
+		.quick-searches { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 11px; }
+		.quick-label { margin-right: 2px; color: #868b81; font-size: 10px; }
+		.quick-chip { padding: 5px 9px; border: 1px solid var(--line); border-radius: 50px; background: transparent; color: #5f675d; cursor: pointer; font-size: 10px; transition: border-color .2s, color .2s; }
+		.quick-chip:hover { border-color: var(--green); color: var(--green); }
+		.footer { display: flex; min-height: 61px; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+		.footer p { margin: 0; }
+		.footer a { color: var(--green); text-decoration: none; }
+		.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+		.dialog-backdrop { position: fixed; z-index: 10; inset: 0; display: grid; overflow-y: auto; place-items: center; padding: 24px; background: rgba(23, 31, 24, .55); backdrop-filter: blur(3px); }
+		.dialog-backdrop[hidden] { display: none; }
+		.recipe-dialog { position: relative; width: min(720px, 100%); max-height: min(820px, calc(100dvh - 48px)); overflow-y: auto; border-radius: 6px; background: var(--surface); box-shadow: var(--shadow); animation: rise-in .22s both; }
+		.dialog-close { position: absolute; z-index: 1; top: 12px; right: 12px; width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+		.dialog-image { width: 100%; height: 260px; display: block; background: #e7e9df; object-fit: cover; }
+		.dialog-content { padding: 25px 29px 30px; }
+		.dialog-meta { margin-bottom: 8px; color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; }
+		.dialog-title { margin-bottom: 20px; font-family: 'Playfair Display', Georgia, serif; font-size: 32px; font-weight: 600; line-height: 1.15; }
+		.dialog-content h3 { margin: 22px 0 10px; font-family: 'Playfair Display', Georgia, serif; font-size: 19px; }
+		.ingredient-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; padding: 0; list-style: none; }
+		.ingredient-list li { padding-bottom: 7px; border-bottom: 1px solid var(--line); color: #565e55; font-size: 12px; line-height: 1.45; }
+		.ingredient-list li::before { margin-right: 7px; color: var(--coral); content: '•'; }
+		.instructions { color: #62695f; font-size: 13px; line-height: 1.8; white-space: pre-line; }
+		.youtube-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; color: var(--green); font-size: 12px; font-weight: 700; text-decoration: none; }
+		@keyframes spin { to { transform: rotate(360deg); } }
+		@keyframes cloud-drift { from { transform: translate3d(-1.5%, -1%, 0) scale(1); } to { transform: translate3d(1.5%, 1.5%, 0) scale(1.06); } }
+		@keyframes rise-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+		@media (max-width: 900px) { .hero { grid-template-columns: 1fr .8fr; gap: 24px; } .meal-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+		@media (max-width: 650px) {
+			.shell { width: min(100% - 36px, 500px); } .topbar { min-height: 66px; }
+			.hero { grid-template-columns: 1fr; gap: 17px; padding: 34px 0 27px; }
+			h1 { max-width: 460px; font-size: clamp(40px, 11vw, 54px); }
+			.hero-art { height: 200px; } .hero-photo { inset: 0 20px 0 0; width: calc(100% - 20px); border-radius: 5px 45% 5px 5px; }
+			.photo-note { right: 0; bottom: 11px; } .section-heading { align-items: center; } h2 { font-size: 25px; }
+			.meal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } .meal-image-wrap { aspect-ratio: 1.15; }
+			.meal-info { padding: 11px 10px 12px; } .meal-title { font-size: 15px; }
+			.filter-select { min-width: 0; flex: 1; } .filter-group { width: 100%; } .sort-select { margin-left: auto; }
+			.toolbar { gap: 6px; } .discover { padding-top: 23px; }
+			.dialog-backdrop { padding: 12px; } .dialog-image { height: 205px; }
+			.dialog-content { padding: 21px 19px 24px; } .dialog-title { font-size: 27px; }
+			.footer { align-items: flex-start; justify-content: center; flex-direction: column; gap: 5px; padding: 13px 0; }
+		}
+		@media (max-width: 370px) { .shell { width: calc(100% - 28px); } .meal-grid { gap: 9px; } .meal-title { font-size: 14px; } .search-button { padding: 0 12px; } }
+	</style>
+</head>
+<body>
+	<div class="ambient-clouds" aria-hidden="true"></div>
+	<header class="shell topbar">
+		<a class="brand" href="#top" aria-label="Gather and Graze home">
+			<span class="brand-mark" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v6m4-6v6M9 9v12M17 3c-2 3-2 7 0 9v9m0-18v9"/></svg></span>
+			<span class="brand-name">gather <span>&amp;</span> graze</span>
+		</a>
+		<button class="saved-toggle" id="savedToggle" type="button" aria-pressed="false">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>
+			Saved <span class="saved-count" id="savedCount">0</span>
+		</button>
+	</header>
+
+	<main id="top">
+		<section class="shell hero" aria-labelledby="pageTitle">
+			<div class="hero-copy">
+				<p class="eyebrow">A little inspiration for dinner</p>
+				<h1 id="pageTitle">Good food.<br><em>Good mood.</em></h1>
+				<p class="hero-description">Find something delicious, discover flavors from around the world, and make tonight a little more special.</p>
+				<form class="search-form" id="searchForm" role="search">
+					<svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+					<input id="searchInput" type="search" placeholder="Try “pasta”, “salmon”, “curry”…" autocomplete="off" aria-label="Search recipes by name">
+					<button class="search-button" type="submit">Find recipes</button>
+				</form>
+				<div class="quick-searches" aria-label="Popular searches">
+					<span class="quick-label">Try:</span>
+					<button class="quick-chip" type="button" data-query="pasta">Pasta</button><button class="quick-chip" type="button" data-query="chicken">Chicken</button><button class="quick-chip" type="button" data-query="vegetarian">Vegetarian</button><button class="quick-chip" type="button" data-query="dessert">Dessert</button>
+				</div>
+			</div>
+			<div class="hero-art" aria-label="A colorful meal, ready to enjoy">
+				<img class="hero-photo" src="https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg" alt="A freshly prepared pasta dish" fetchpriority="high">
+				<span class="hero-spark" aria-hidden="true">✳</span><div class="photo-note"><span class="note-dot" aria-hidden="true"></span> Something lovely is cooking</div>
+			</div>
+		</section>
+
+		<section class="shell discover" aria-labelledby="resultsTitle">
+			<div class="section-heading"><div><p class="section-kicker">Your next delicious idea</p><h2 id="resultsTitle">Explore recipes</h2></div><p class="result-count" id="resultCount" aria-live="polite">Find a favorite</p></div>
+			<div class="toolbar" aria-label="Filter and sort recipes">
+				<div class="filter-group">
+					<label class="visually-hidden" for="categoryFilter">Filter by category</label><select class="filter-select" id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option></select>
+					<label class="visually-hidden" for="areaFilter">Filter by cuisine</label><select class="filter-select" id="areaFilter" aria-label="Filter by cuisine"><option value="">All cuisines</option></select>
+					<button class="clear-button" id="clearFilters" type="button">Clear filters</button>
+				</div>
+				<label class="visually-hidden" for="sortFilter">Sort recipes</label><select class="filter-select sort-select" id="sortFilter" aria-label="Sort recipes"><option value="name">Sort: A to Z</option><option value="name-desc">Sort: Z to A</option><option value="area">Sort: Cuisine</option></select>
+			</div>
+			<div class="meal-grid" id="mealGrid" aria-live="polite" aria-busy="false">
+				<div class="state-panel"><span class="state-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span><h3>Your next favorite starts here</h3><p>Search for an ingredient or dish to find something wonderful to make.</p></div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="shell footer"><p>Made for the joy of finding something delicious.</p><p>Recipes and photography via <a href="https://www.themealdb.com/" target="_blank" rel="noreferrer">TheMealDB</a></p></footer>
+
+	<div class="dialog-backdrop" id="recipeBackdrop" hidden>
+		<section class="recipe-dialog" id="recipeDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" tabindex="-1">
+			<button class="dialog-close" id="closeDialog" type="button" aria-label="Close recipe"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg></button>
+			<img class="dialog-image" id="dialogImage" src="" alt=""><div class="dialog-content" id="dialogContent"></div>
+		</section>
+	</div>
+
+	<script>
+		const API = 'https://www.themealdb.com/api/json/v1/1';
+		const grid = document.querySelector('#mealGrid');
+		const searchForm = document.querySelector('#searchForm');
+		const searchInput = document.querySelector('#searchInput');
+		const categoryFilter = document.querySelector('#categoryFilter');
+		const areaFilter = document.querySelector('#areaFilter');
+		const sortFilter = document.querySelector('#sortFilter');
+		const resultCount = document.querySelector('#resultCount');
+		const savedToggle = document.querySelector('#savedToggle');
+		const savedCount = document.querySelector('#savedCount');
+		const backdrop = document.querySelector('#recipeBackdrop');
+		const favoritesKey = 'gather-and-graze-favorites';
+		let meals = [];
+		let showingSaved = false;
+		let previousFocus = null;
+		let searchSequence = 0;
+		let favorites = loadFavorites();
+
+		function loadFavorites() {
+			try {
+				const stored = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
+				return new Set(Array.isArray(stored) ? stored : []);
+			} catch { return new Set(); }
+		}
+
+		function saveFavorites() {
+			try { localStorage.setItem(favoritesKey, JSON.stringify([...favorites])); } catch { /* Storage may be unavailable in private browsing. */ }
+			savedCount.textContent = String(favorites.size);
+		}
+
+		function escapeHtml(value = '') {
+			return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+		}
+
+		function renderState(title, message, icon = 'search') {
+			const iconMarkup = icon === 'error'
+				? '<path d="M12 8v4m0 4h.01M10.3 3.9 1.9 18.5A2 2 0 0 0 3.6 21h16.8a2 2 0 0 0 1.7-2.5L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'
+				: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>';
+			grid.innerHTML = `<div class="state-panel"><span class="state-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${iconMarkup}</svg></span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(message)}</p>${icon === 'error' ? '<button class="retry-button" type="button" id="retrySearch">Try again</button>' : ''}</div>`;
+			grid.setAttribute('aria-busy', 'false');
+			const retry = document.querySelector('#retrySearch');
+			if (retry) retry.addEventListener('click', () => searchMeals(searchInput.value.trim()));
+		}
+
+		function setOptions(select, values, placeholder) {
+			const current = select.value;
+			const options = [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+			select.innerHTML = `<option value="">${placeholder}</option>` + options.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+			if (options.includes(current)) select.value = current;
+		}
+
+		function updateFilterOptions() {
+			setOptions(categoryFilter, meals.map((meal) => meal.strCategory), 'All categories');
+			setOptions(areaFilter, meals.map((meal) => meal.strArea), 'All cuisines');
+		}
+
+		function visibleMeals() {
+			let result = meals.filter((meal) => (!categoryFilter.value || meal.strCategory === categoryFilter.value)
+				&& (!areaFilter.value || meal.strArea === areaFilter.value)
+				&& (!showingSaved || favorites.has(meal.idMeal)));
+			if (sortFilter.value === 'name-desc') result = result.sort((a, b) => b.strMeal.localeCompare(a.strMeal));
+			else if (sortFilter.value === 'area') result = result.sort((a, b) => (a.strArea || '').localeCompare(b.strArea || '') || a.strMeal.localeCompare(b.strMeal));
+			else result = result.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
+			return result;
+		}
+
+		function renderMeals() {
+			const result = visibleMeals();
+			resultCount.textContent = showingSaved ? `${result.length} saved ${result.length === 1 ? 'recipe' : 'recipes'}` : `${result.length} ${result.length === 1 ? 'recipe' : 'recipes'}${meals.length ? ' found' : ''}`;
+			savedToggle.setAttribute('aria-pressed', String(showingSaved));
+			if (!meals.length) { renderState('Nothing to show just yet', 'Search for a dish or ingredient and your saved recipes will appear here.'); return; }
+			if (!result.length) {
+				renderState(showingSaved ? 'No saved recipes yet' : 'No recipes match those filters', showingSaved ? 'Tap the heart on any recipe to keep it here for later.' : 'Try clearing a filter or searching for a different dish.');
+				return;
+			}
+			grid.setAttribute('aria-busy', 'false');
+			grid.innerHTML = result.map((meal, index) => {
+				const isSaved = favorites.has(meal.idMeal);
+				return `<article class="meal-card" style="animation-delay:${Math.min(index * 45, 270)}ms"><div class="meal-image-wrap">
+					<img class="meal-image" src="${escapeHtml(meal.strMealThumb || '')}" alt="${escapeHtml(meal.strMeal)}" loading="lazy">
+					<span class="meal-category">${escapeHtml(meal.strCategory || 'Something delicious')}</span>
+					<button class="favorite-button${isSaved ? ' is-saved' : ''}" type="button" data-favorite="${escapeHtml(meal.idMeal)}" aria-label="${isSaved ? 'Remove' : 'Save'} ${escapeHtml(meal.strMeal)} ${isSaved ? 'from' : 'to'} saved recipes" aria-pressed="${isSaved}">
+						<svg width="17" height="17" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg></button>
+					</div><div class="meal-info"><p class="meal-area">${escapeHtml(meal.strArea || 'From the kitchen')}</p><h3 class="meal-title">${escapeHtml(meal.strMeal)}</h3><button class="card-link" type="button" data-recipe="${escapeHtml(meal.idMeal)}">View recipe <span aria-hidden="true">→</span></button></div></article>`;
+			}).join('');
+			grid.querySelectorAll('[data-favorite]').forEach((button) => button.addEventListener('click', () => toggleFavorite(button.dataset.favorite)));
+			grid.querySelectorAll('[data-recipe]').forEach((button) => button.addEventListener('click', () => openRecipe(button.dataset.recipe)));
+		}
+
+		async function searchMeals(query) {
+			const request = ++searchSequence;
+			searchInput.value = query;
+			showingSaved = false;
+			savedToggle.setAttribute('aria-pressed', 'false');
+			categoryFilter.value = '';
+			areaFilter.value = '';
+			if (!query) {
+				meals = [];
+				updateFilterOptions();
+				resultCount.textContent = 'Find a favorite';
+				grid.innerHTML = '<div class="state-panel"><span class="state-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span><h3>Your next favorite starts here</h3><p>Search for an ingredient or dish to find something wonderful to make.</p></div>';
+				return;
+			}
+			grid.setAttribute('aria-busy', 'true');
+			resultCount.textContent = 'Finding something delicious…';
+			grid.innerHTML = '<div class="loader"><span class="spinner" aria-hidden="true"></span>Looking for recipes…</div>';
+			try {
+				const response = await fetch(`${API}/search.php?s=${encodeURIComponent(query)}`);
+				if (!response.ok) throw new Error('The recipe service returned an error.');
+				const data = await response.json();
+				if (request !== searchSequence) return;
+				meals = data.meals || [];
+				updateFilterOptions();
+				if (!meals.length) { resultCount.textContent = 'No recipes found'; renderState('No recipes found', `We couldn't find a match for “${query}”. Try another ingredient or dish.`); return; }
+				renderMeals();
+			} catch {
+				if (request !== searchSequence) return;
+				resultCount.textContent = 'Could not load recipes';
+				renderState('The kitchen is taking a moment', 'Check your connection and try that search again.', 'error');
+			}
+		}
+
+		function toggleFavorite(id) {
+			if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+			saveFavorites();
+			renderMeals();
+		}
+
+		function openRecipe(id) {
+			const meal = meals.find((item) => item.idMeal === id);
+			if (!meal) return;
+			previousFocus = document.activeElement;
+			const ingredients = Array.from({ length: 20 }, (_, index) => {
+				const number = index + 1;
+				const ingredient = meal[`strIngredient${number}`]?.trim();
+				const measure = meal[`strMeasure${number}`]?.trim();
+				return ingredient ? `<li>${escapeHtml([measure, ingredient].filter(Boolean).join(' '))}</li>` : '';
+			}).filter(Boolean).join('');
+			document.querySelector('#dialogImage').src = meal.strMealThumb || '';
+			document.querySelector('#dialogImage').alt = meal.strMeal;
+			document.querySelector('#dialogContent').innerHTML = `<p class="dialog-meta">${escapeHtml([meal.strArea, meal.strCategory].filter(Boolean).join(' · '))}</p><h2 class="dialog-title" id="dialogTitle">${escapeHtml(meal.strMeal)}</h2><h3>What you'll need</h3><ul class="ingredient-list">${ingredients || '<li>Ingredients not listed</li>'}</ul><h3>How to make it</h3><p class="instructions">${escapeHtml(meal.strInstructions || 'Instructions not listed.')}</p>${meal.strYoutube ? `<a class="youtube-link" href="${escapeHtml(meal.strYoutube)}" target="_blank" rel="noreferrer">Watch the recipe <span aria-hidden="true">↗</span></a>` : ''}`;
+			backdrop.hidden = false;
+			document.body.style.overflow = 'hidden';
+			document.querySelector('#recipeDialog').focus();
+		}
+
+		function closeRecipe() {
+			backdrop.hidden = true;
+			document.body.style.overflow = '';
+			if (previousFocus?.isConnected) previousFocus.focus();
+		}
+
+		searchForm.addEventListener('submit', (event) => { event.preventDefault(); searchMeals(searchInput.value.trim()); });
+		document.querySelectorAll('[data-query]').forEach((button) => button.addEventListener('click', () => searchMeals(button.dataset.query)));
+		categoryFilter.addEventListener('change', renderMeals);
+		areaFilter.addEventListener('change', renderMeals);
+		sortFilter.addEventListener('change', renderMeals);
+		document.querySelector('#clearFilters').addEventListener('click', () => {
+			categoryFilter.value = ''; areaFilter.value = ''; sortFilter.value = 'name'; showingSaved = false; renderMeals();
+		});
+		savedToggle.addEventListener('click', () => { showingSaved = !showingSaved; renderMeals(); });
+		document.querySelector('#closeDialog').addEventListener('click', closeRecipe);
+		backdrop.addEventListener('click', (event) => { if (event.target === backdrop) closeRecipe(); });
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape' && !backdrop.hidden) closeRecipe();
+			if (event.key === 'Tab' && !backdrop.hidden) {
+				const focusable = [...backdrop.querySelectorAll('button, a[href]')];
+				const first = focusable[0]; const last = focusable.at(-1);
+				if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+				else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+			}
+		});
+		saveFavorites();
+	</script>
+</body>
+</html>
